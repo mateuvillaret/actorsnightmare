@@ -123,4 +123,13 @@ scala> :quit
 [warn] Disable this warning by setting `Global / onChangedBuildSource := IgnoreSourceChanges`.
 sbt:hello-world> 
 ```
+# Add dependencies to the project
 
+To add dependencies to the project (additional libraries to use in the project) you have to modify the hello-world-template/build.sbt (ongoing example) and add the line below.
+in this example we add akka typed actors library: 
+```
+...
+libraryDependencies ++= Seq("com.typesafe.akka" %% "akka-actor-typed" % "2.6.9")
+...
+```
+You can find more published libraries on [Scaladex](https://index.scala-lang.org/), the Scala library index, where you can also copy the above dependency information for pasting into your build.sbt file.
