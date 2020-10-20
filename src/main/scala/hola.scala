@@ -1,17 +1,40 @@
-//package main
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 
+case class HolaCadena(nom: String, cont: ActorRef)
+case class Hola(nom: String)
+case class Adeu()
+
+class Saludador extends Actor {
+  var salutacions=0
+  def receive: Receive = {
+    case HolaCadena(nom,c) =>
+      println(s"Soc en "+ self.path.name + s" hola $nom" + ". Vaig a saludar a en " + c.path.name)
+      salutacions+=1
+      c ! Hola(self.path.name)
+    case Hola(nom) =>
+      println(s"Soc en " + self.path.name+ s" hola $nom" + " FI SALUTACIONS")
+      salutacions +=1
+    case Adeu =>
+      println(s"Soc en " + self.path.name +": Adeu si t'en vas... He rebut " + salutacions + " salutacions !")
+  }
+}
 
 object Main extends App {
-  val max = 10000000
-  def isPrime(n: Int): Boolean = new java.math.BigInteger("" + n).isProbablePrime(20)
 
-  println(s"Anem a comptar primers, de 2 a $max")
-  val temps = System.nanoTime
-  val answer = (2 to max).count(isPrime)
+  val systema = ActorSystem("sistema")
 
-  println(s"Hi ha $answer primers")
-  println("S'ha trigat: " + (System.nanoTime - temps) / 1e9d + " segons")
+  val fulano = systema.actorOf(Props[Saludador], name = "fulanito")
+  val mengano = systema.actorOf(Props[Saludador], name = "menganito")
+
+  fulano ! HolaCadena("Main",mengano)
+  mengano ! HolaCadena("Main",fulano)
+
+  println("MAIN: Ja he enviat les salutacions encadenades... i esperare 1 segon abans de dir adeu...")
+  Thread.sleep(1000)
+  fulano ! Adeu
+  mengano ! Adeu
 }
+
 
 
 
